@@ -1,13 +1,25 @@
-from aiogram import Bot
-from aiogram.types import BotCommand
+from aiogram import Bot, Router, Dispatcher
+from aiogram.types import BotCommand, Message
 
 from ..core.manager.create_memory import CreateMemoryManager
 from ._bot import BaseMemoryBot
 
-from .memory import MemoryGetSendRouter
+from .memory import MemoryGetSendRouter, BaseRouter
 
 
 __all__ = ["setup_bot", "start_bot"]
+
+
+def help_func(dp: Dispatcher):
+    router = Router()
+
+    @router.message()
+    async def unknown_command(message: Message):
+        await message.answer(
+            "Неизвестная команда. Используйте /help для получения списка доступных команд."
+        )
+
+    dp.include_router(router)
 
 
 async def init_command(bot: Bot):
@@ -15,6 +27,7 @@ async def init_command(bot: Bot):
         [
             BotCommand(command="create", description="Создать воспоминание"),
             BotCommand(command="memory", description="Увидеть воспоминание"),
+            BotCommand(command="help", description="Помощь"),
         ]
     )
 
@@ -26,10 +39,12 @@ async def setup_bot(
 ) -> BaseMemoryBot:
     bot = BaseMemoryBot(manager, token=token, proxy=proxy)
 
-    routers = [MemoryGetSendRouter(bot)]
+    routers = [MemoryGetSendRouter(bot), BaseRouter(bot)]
 
     for router in routers:
         bot.register_router(router)
+
+    help_func(bot.dispatcher)
 
     await init_command(bot.bot)
     return bot

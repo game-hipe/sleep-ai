@@ -19,9 +19,7 @@ async def main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    async with AsyncClient(
-        proxy = config.proxy
-    ) as client:
+    async with AsyncClient(proxy=config.proxy) as client:
         telegraph = Telegraph(client)
         gemini = GeminiManager(client)
         api = MemoryManager(engine)
