@@ -28,6 +28,7 @@ async function LoadMemory(id) {
     const result = JSON.parse(await response.text());
     if (!result.success) {
         alert(result.message);
+        window.location.href = "/";
         return;
     }
     else if (!result.content) {

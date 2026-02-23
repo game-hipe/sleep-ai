@@ -1,26 +1,40 @@
 from abc import ABC, abstractmethod
+from urllib.parse import urlparse
 
 from loguru import logger
+from aiohttp import BasicAuth
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.client.default import DefaultBotProperties
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, Router
 
 from ..core.manager.memory import MemoryManager
 from ..core.abstract.ai import AIInterface
 from ..core import config
 
 
-class BaseMemoryBot(ABC):
-    """Базовый класс Бота Aiogram, который использует MemoryManager для управления памятью и AIInterface для взаимодействия с ИИ."""
+class MemoryBotRouter(ABC):
+    def __init__(self, memory_bot: "BaseMemoryBot"):
+        self.memory_bot = memory_bot
+        self._router = Router()
 
-    def __init_subclass__(cls):
-        return super().__init_subclass__()
+        self.register_handler()
+
+    @abstractmethod
+    def register_handler(self): ...
+
+    @property
+    def router(self):
+        return self._router
+
+
+class BaseMemoryBot:
+    """Базовый класс Бота Aiogram, который использует MemoryManager для управления памятью и AIInterface для взаимодействия с ИИ."""
 
     def __init__(
         self,
-        memory_manager: MemoryManager,
         ai_manager: AIInterface,
+        memory_manager: MemoryManager,
         token: str | None = None,
         proxy: str | None = None,
     ):
@@ -40,8 +54,6 @@ class BaseMemoryBot(ABC):
         self._bot: Bot | None = None
         self._dp: Dispatcher | None = None
 
-        self.register_handlers()
-
     async def run(self):
         """Запустить бота"""
         try:
@@ -50,9 +62,13 @@ class BaseMemoryBot(ABC):
         finally:
             await self.bot.session.close()
 
-    @abstractmethod
-    def register_handlers(self):
-        """Зарегистрировать обработчики бота"""
+    def register_router(self, router: MemoryBotRouter):
+        """Регистрирует новый Handler
+
+        Args:
+            router (MemoryBotRouter): Экземпляр класса MemoryBotRouter
+        """
+        self.dispatcher.include_router(router.router)
 
     def _create_bot(self, token: str | None = None) -> Bot:
         """Создать экземпляр бота
@@ -66,7 +82,7 @@ class BaseMemoryBot(ABC):
         return Bot(
             token=token or self._token,
             default=DefaultBotProperties(parse_mode="HTML"),
-            session=AiohttpSession(proxy=self._proxy),
+            session=AiohttpSession(proxy=self.proxy),
         )
 
     def _create_dispatcher(self) -> Dispatcher:
@@ -83,9 +99,20 @@ class BaseMemoryBot(ABC):
         return self._token
 
     @property
-    def proxy(self) -> str | None:
+    def proxy(self) -> str | tuple[str, BasicAuth] | None:
         """Получить прокси сервера"""
-        return self._proxy
+        logger.debug(self._proxy)
+        if not self._proxy:
+            logger.debug("Нету прокси")
+            return None
+
+        parsed = urlparse(self._proxy)
+        if not parsed.username and parsed.password:
+            logger.debug("Прокси есть но без логина и пароля")
+            return self._proxy
+
+        logger.debug("Пароль и логин есть")
+        return self._proxy, BasicAuth(login=parsed.username, password=parsed.password)
 
     @property
     def bot(self) -> Bot:

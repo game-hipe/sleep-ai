@@ -50,7 +50,10 @@ async function LoadMemory(id: string | number) {
     
     const result = JSON.parse(await response.text()) as MemoryResponse
     if (!result.success) {
+        console.log("Not Found!");
+        
         alert(result.message);
+        window.location.href = "/";
         return;
     } else if (!result.content) {
         alert("No content");

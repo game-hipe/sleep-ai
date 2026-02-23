@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 
 from .state import MemoryStates
 from ._text import MEMORY_TEXT
-from .._bot import BaseMemoryBot
+from .._bot import MemoryBotRouter
 from ...core.entites.schemas import (
     SleepMemoryBaseModel,
     SleepMemoryCreateModel,
@@ -16,16 +16,42 @@ from ...core.entites.schemas import (
 )
 
 
-class MemoryBot(BaseMemoryBot):
-    def register_handlers(self):
-        self.dispatcher.message.register(self.create_memory, Command("create"))
+class MemoryGetSendRouter(MemoryBotRouter):
+    def register_handler(self):
+        self.router.message.register(self.create_memory, Command("create"))
+        self.router.message.register(self.get_memory, Command("memory"))
 
-        self.dispatcher.message.register(
+        self.router.message.register(
             self.process_title, MemoryStates.waiting_for_title, F.text
         )
 
-        self.dispatcher.message.register(
+        self.router.message.register(
             self.process_content, MemoryStates.waiting_for_content, F.text
+        )
+
+    async def get_memory(self, message: Message):
+        logger.debug(
+            f"Получение воспоминания (user_id={message.from_user.id}, chat_id={message.chat.id})"
+        )
+        try:
+            _, id = message.text.split(maxsplit=1)
+        except ValueError:
+            await message.answer("Пожалуйста, введите ID воспоминания после команды.")
+            return
+
+        response = await self.memory_bot.memory_manager.get_memory(id)
+        if not response.success:
+            logger.debug(f"Воспоминание не найдено (id={response.content.id})")
+            await message.answer(f"Воспоминание под ID {id} не надено.")
+            return
+
+        await message.answer(
+            MEMORY_TEXT.format(
+                id=response.content.id,
+                title=response.content.title,
+                content=response.content.content,
+                thoughts=response.content.ai_thoughts,
+            )
         )
 
     async def create_memory(self, message: Message, state: FSMContext):
@@ -68,13 +94,16 @@ class MemoryBot(BaseMemoryBot):
                 )
                 return
 
-            memory_response = await self.memory_manager.add_memory(response.content)
+            memory_response = await self.memory_bot.memory_manager.add_memory(
+                response.content
+            )
 
             if not memory_response.success:
                 await message.answer(
                     f"Произошла ошибка при добавлении воспоминания: {memory_response.message}"
                 )
                 return
+            print(memory_response.content.created_at)
 
             await message.answer(
                 MEMORY_TEXT.format(
@@ -96,19 +125,23 @@ class MemoryBot(BaseMemoryBot):
     async def think(
         self, message: Message, title: str, content: str
     ) -> BaseResponseModel[SleepMemoryCreateModel]:
-        await self.bot.send_chat_action(chat_id=message.chat.id, action="typing")
         message = await message.answer("Раздумываю над ответом")
+        await self.memory_bot.bot.send_chat_action(
+            chat_id=message.chat.id, action="typing"
+        )
         try:
             task = asyncio.create_task(self._animation(message))
-            response = await self.ai_manager.generate_response(
+            response = await self.memory_bot.ai_manager.generate_response(
                 SleepMemoryBaseModel(title=title, content=content)
             )
 
             return response
         finally:
             task.cancel()
-            await self.bot.send_chat_action(chat_id=message.chat.id, action="cancel")
             await message.delete()
+            await self.memory_bot.bot.send_chat_action(
+                chat_id=message.chat.id, action="cancel"
+            )
 
     async def _animation(self, message: Message):
         """Анимация для бота."""

@@ -8,6 +8,7 @@ from src.core.entites.models import Base
 from src.core.manager import GeminiManager, MemoryManager
 
 from src.frontend import start_frontend
+from src.bot import start_bot
 
 
 async def main():
@@ -17,17 +18,13 @@ async def main():
 
     try:
         async with AsyncClient() as client:
-            api = GeminiManager(client)
-            manager = MemoryManager(database)
+            ai_manager = GeminiManager(client)
+            memory_manager = MemoryManager(database)
 
-            # bot = MemoryBot(
-            #    memory_manager = manager,
-            #    ai_manager = api
-            # )
-            #
-            # await bot.run()
-
-            await start_frontend(api, manager)
+            await asyncio.gather(
+                start_frontend(ai_manager, memory_manager),
+                start_bot(ai_manager, memory_manager),
+            )
 
     finally:
         await database.dispose()
