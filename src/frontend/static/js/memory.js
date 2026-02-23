@@ -27,6 +27,7 @@ async function LoadMemory(id) {
     }
     const result = JSON.parse(await response.text());
     if (!result.success) {
+        console.log("Not Found!");
         alert(result.message);
         window.location.href = "/";
         return;
@@ -57,10 +58,20 @@ async function LoadMemory(id) {
     const createdAt = document.createElement("p");
     createdAt.setAttribute("class", "created-at");
     createdAt.textContent = formatDate(result.content.created_at);
+    const TelegraphUrl = document.createElement("a");
+    if (result.content.telegraph_url) {
+        TelegraphUrl.setAttribute("href", result.content.telegraph_url);
+        TelegraphUrl.setAttribute("class", "telegraph");
+        TelegraphUrl.textContent = "Пост в Telegraph";
+    }
+    console.log(result.content.telegraph_url);
     infoBox.appendChild(title);
     infoBox.appendChild(content);
     infoBox.appendChild(aiText);
     infoBox.appendChild(createdAt);
+    if (result.content.telegraph_url) {
+        infoBox.appendChild(TelegraphUrl);
+    }
     mainBox.appendChild(infoBox);
 }
 LoadMemory(ID);

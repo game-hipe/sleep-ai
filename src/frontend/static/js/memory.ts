@@ -10,6 +10,7 @@ interface SleepMemoryResponse {
     content: string
     ai_thoughts: string
     created_at: string
+    telegraph_url: string | null
 }
 
 interface MemoryResponse extends BaseResponse<SleepMemoryResponse> {}
@@ -84,14 +85,26 @@ async function LoadMemory(id: string | number) {
     aiText.setAttribute("class", "ai-text");
     aiText.innerHTML = result.content.ai_thoughts;
 
-    const createdAt = document.createElement("p")
-    createdAt.setAttribute("class", "created-at")
-    createdAt.textContent = formatDate(result.content.created_at)
+    const createdAt = document.createElement("p");
+    createdAt.setAttribute("class", "created-at");
+    createdAt.textContent = formatDate(result.content.created_at);
 
+    const TelegraphUrl = document.createElement("a");
+    if (result.content.telegraph_url) {
+        TelegraphUrl.setAttribute("href", result.content.telegraph_url);
+        TelegraphUrl.setAttribute("class", "telegraph");
+        TelegraphUrl.textContent = "Пост в Telegraph";
+    }
+
+    console.log(result.content.telegraph_url);
+    
     infoBox.appendChild(title);
     infoBox.appendChild(content);
     infoBox.appendChild(aiText);
     infoBox.appendChild(createdAt);
+    if (result.content.telegraph_url) {
+        infoBox.appendChild(TelegraphUrl);
+    }
     mainBox.appendChild(infoBox);
 }
 
