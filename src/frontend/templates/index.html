@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep · Ai</title>
+    <style>
+        /* Абсолютно чёрно-белая гамма, полупрозрачные элементы */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #ffffff;  /* чистый белый фон */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 16px;
+            color: rgba(0, 0, 0, 0.75); /* базовый цвет текста с прозрачностью */
+        }
+
+        .telegraph-form {
+            width: 100%;
+            max-width: 600px;  /* чуть шире, чтобы текст помещался */
+            background: transparent;
+        }
+
+        /* Заголовок — чёрный, но с прозрачностью, крупный, тонкий */
+        .telegraph-form h1 {
+            font-size: 2.8rem;
+            font-weight: 300;  /* тонкое начертание */
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            color: rgba(0, 0, 0, 0.8);
+            line-height: 1.1;
+        }
+
+        /* Обёртки для полей */
+        .telegraph-form > div {
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+
+        /* Стили для input и textarea — общие черты */
+        input,
+        textarea {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.15); /* очень светлая полупрозрачная линия */
+            background: transparent;
+            font-size: 1.4rem;
+            padding: 0.6rem 0 0.4rem;
+            outline: none;
+            font-weight: 300;
+            color: rgba(0, 0, 0, 0.8);
+            resize: vertical;  /* разрешаем менять высоту только вертикально */
+            font-family: inherit;
+            line-height: 1.5;
+        }
+
+        /* У textarea будет минимальная высота, чтобы сразу было видно многострочность */
+        textarea {
+            min-height: 800px;  /* достаточно для 3-4 строк */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.15);  /* такая же линия */
+            /* Убираем стандартный скроллбар, оставляем только при необходимости */
+            overflow-y: auto;
+        }
+
+        /* При фокусе делаем линию чуть темнее, но всё ещё полупрозрачной */
+        input:focus,
+        textarea:focus {
+            border-bottom-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Placeholder очень светлый, полупрозрачный */
+        input::placeholder,
+        textarea::placeholder {
+            color: rgba(0, 0, 0, 0.25);
+            font-weight: 300;
+            font-size: 1.2rem;
+        }
+
+        /* Для мобильных чуть уменьшаем шрифт */
+        @media (max-width: 480px) {
+            input,
+            textarea {
+                font-size: 1.2rem;
+            }
+            input::placeholder,
+            textarea::placeholder {
+                font-size: 1rem;
+            }
+            .telegraph-form h1 {
+                font-size: 2.4rem;
+            }
+        }
+
+        /* Кнопка — полупрозрачная чёрная с белым текстом */
+        button {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            border-radius: 40px;        /* мягкие края */
+            padding: 1rem 1.2rem;
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.9);  /* белый полупрозрачный */
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 1rem;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+            outline: none;
+        }
+
+        /* При наведении кнопка становится чуть плотнее */
+        button:hover {
+            background: rgba(0, 0, 0, 0.85);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Фокус для доступности — светлая рамка */
+        button:focus-visible {
+            outline: 2px solid rgba(0, 0, 0, 0.5);
+            outline-offset: 2px;
+        }
+
+        /* Убираем автозаполнение браузера (оставляем ч/б) */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus,
+        textarea:-webkit-autofill,
+        textarea:-webkit-autofill:hover,
+        textarea:-webkit-autofill:focus {
+            -webkit-text-fill-color: rgba(0, 0, 0, 0.8);
+            -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        async function FetchMemory(title, content) {
+            response = fetch('/api/memory', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify()
+            })
+        }
+
+        function CreateMemory() {
+            var title = document.getElementById("title")?.value
+            var content = document.getElementById("content")?.value
+
+            if (!title) {
+                alert("Введите название сна");
+                return
+            } else if (!content) {
+                alert("Введите содержание сна");
+                return
+            } else {
+                console.log("sex!");
+
+            }
+        }
+    </script>
+    <div class="telegraph-form">
+        <h1>Sleep · Ai</h1>
+
+        <div>
+            <input type="text" id="title" placeholder="Введите название сна">
+        </div>
+        <div>
+            <textarea id="content" placeholder="Введите содержание сна"></textarea>
+        </div>
+
+        <button type="button" onclick="CreateMemory()">Создать воспоминание</button>
+    </div>
+</body>
+</html>
