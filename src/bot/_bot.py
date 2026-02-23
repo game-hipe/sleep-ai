@@ -104,7 +104,7 @@ class BaseMemoryBot:
             return None
 
         parsed = urlparse(self._proxy)
-        if not parsed.username and parsed.password:
+        if not parsed.username and not parsed.password:
             logger.debug("Прокси есть но без логина и пароля")
             return self._proxy
 

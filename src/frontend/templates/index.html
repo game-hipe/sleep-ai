@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sleep · Ai</title>
     <link rel="stylesheet" href="/static/css/style.css">
-    <script src="/static/js/script.js"></script>
+    <script src="/static/js/script.js" defer></script>
 </head>
 <body>
     <div class="telegraph-form">
@@ -18,7 +18,13 @@
             <textarea id="content" placeholder="Введите содержание сна"></textarea>
         </div>
 
-        <button type="button" onclick="CreateMemory()">Создать воспоминание</button>
+        <button type="button" onclick="CreateMemory()" id="submitBtn">Создать воспоминание</button>
+    </div>
+
+    <!-- Оверлей загрузки (скрыт по умолчанию) -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <span class="loading-text"></span>
     </div>
 </body>
 </html>
