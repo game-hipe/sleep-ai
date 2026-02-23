@@ -1,0 +1,222 @@
+/* Абсолютно чёрно-белая гамма, тёмная тема, полупрозрачные элементы */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0a0a0a;  /* глубокий чёрный фон */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.85); /* светлый полупрозрачный текст */
+    line-height: 1.6;
+}
+
+/* Основной контейнер формы (если используется) */
+.telegraph-form {
+    width: 100%;
+    max-width: 720px;  /* чуть шире для удобства чтения */
+    background: transparent;
+}
+
+/* Заголовок — белый с прозрачностью, крупный, тонкий */
+.telegraph-form h1,
+h1 {  /* на случай использования вне формы */
+    font-size: 2.8rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.1;
+}
+
+/* Обёртки для полей формы */
+.telegraph-form > div {
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+/* Стили для input и textarea — общие черты (тёмная тема) */
+input,
+textarea {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15); /* очень светлая полупрозрачная линия */
+    background: transparent;
+    font-size: 1.4rem;
+    padding: 0.6rem 0 0.4rem;
+    outline: none;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.8);
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+/* У textarea минимальная высота */
+textarea {
+    min-height: 200px;  /* достаточно для 3-4 строк, но можно изменить */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    overflow-y: auto;
+}
+
+/* При фокусе линия становится ярче */
+input:focus,
+textarea:focus {
+    border-bottom-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Placeholder очень светлый */
+input::placeholder,
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+    font-weight: 300;
+    font-size: 1.2rem;
+}
+
+/* Кнопка — полупрозрачная светлая с тёмным текстом */
+button {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 40px;
+    padding: 1rem 1.2rem;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.8);  /* тёмный текст */
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 1rem;
+    font-family: inherit;
+    letter-spacing: 0.3px;
+    outline: none;
+}
+
+/* При наведении кнопка становится плотнее */
+button:hover {
+    background: rgba(255, 255, 255, 0.85);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Фокус для доступности */
+button:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+}
+
+/* Стили для отображения воспоминаний (как в примере HTML) */
+main {
+    width: 100%;
+    max-width: 720px;
+    background: transparent;
+}
+
+/* Контейнер одной записи */
+main > div {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+main > div:last-child {
+    border-bottom: none;
+}
+
+/* Текст самого воспоминания (p.content-text) */
+.content-text {
+    font-size: 1.6rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2rem;
+    font-style: italic;
+    line-height: 1.4;
+    padding-left: 0.5rem;
+    border-left: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Текст анализа AI (p.ai-text) — учитываем двойные переносы */
+.ai-text {
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1.5rem;
+    white-space: pre-line;
+    line-height: 1.6;
+}
+
+/* Стили для тегов внутри ai-text */
+.ai-text b {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 1);
+}
+.ai-text i {
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.9);
+}
+.ai-text u {
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.4);
+    text-underline-offset: 4px;
+}
+.ai-text code {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Дата создания */
+.created-at {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 1rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+/* Для мобильных чуть уменьшаем шрифт */
+@media (max-width: 600px) {
+    body {
+        padding: 16px;
+    }
+    .telegraph-form h1,
+    h1 {
+        font-size: 2.4rem;
+    }
+    .content-text {
+        font-size: 1.4rem;
+    }
+    .ai-text {
+        font-size: 1.1rem;
+    }
+    input,
+    textarea {
+        font-size: 1.2rem;
+    }
+    input::placeholder,
+    textarea::placeholder {
+        font-size: 1rem;
+    }
+}
+
+/* Убираем автозаполнение браузера — адаптируем под тёмную тему */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.8);
+    -webkit-box-shadow: 0 0 0px 1000px #1a1a1a inset;  /* тёмный фон для автозаполнения */
+    transition: background-color 5000s ease-in-out 0s;
+}

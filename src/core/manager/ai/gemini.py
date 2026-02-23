@@ -2,7 +2,11 @@ from loguru import logger
 from google import genai
 from httpx import AsyncClient
 
-from ...entites.schemas import SleepMemoryBaseModel, SleepMemoryCreateModel, BaseResponseModel
+from ...entites.schemas import (
+    SleepMemoryBaseModel,
+    SleepMemoryCreateModel,
+    BaseResponseModel,
+)
 from ...abstract.ai import AIInterface
 from ..._config import config
 
@@ -67,16 +71,14 @@ class GeminiManager(AIInterface):
             return BaseResponseModel(
                 success=True,
                 message="Успешно удалось сгенерировать мнение Ai",
-                content=output_memory
+                content=output_memory,
             )
         except Exception as e:
             logger.error(f"Ошибка при генерации ответа от модели Gemini: {str(e)}")
             return BaseResponseModel(
                 success=False,
                 message=f"Ошибка при обработке ответа от модели Gemini: {str(e)}",
-                content=SleepMemoryCreateModel(
-                    **memory.model_dump()
-                )
+                content=SleepMemoryCreateModel(**memory.model_dump()),
             )
 
     @property

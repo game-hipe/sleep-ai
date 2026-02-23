@@ -39,16 +39,14 @@ class BaseMemoryBot(ABC):
         self._proxy = proxy or config.proxy
         self._bot: Bot | None = None
         self._dp: Dispatcher | None = None
-        
+
         self.register_handlers()
 
     async def run(self):
         """Запустить бота"""
         try:
             logger.success(f"Бот [{await self.bot.get_my_name()}] - Запущен!")
-            await self.dispatcher.start_polling(
-                self.bot
-            )
+            await self.dispatcher.start_polling(self.bot)
         finally:
             await self.bot.session.close()
 

@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
 
-from ..entites.schemas import SleepMemoryBaseModel, SleepMemoryCreateModel, BaseResponseModel
+from ..entites.schemas import (
+    SleepMemoryBaseModel,
+    SleepMemoryCreateModel,
+    BaseResponseModel,
+)
 
 
 class AIInterface(ABC):

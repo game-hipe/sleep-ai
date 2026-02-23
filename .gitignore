@@ -1,5 +1,10 @@
 .venv
 venv
 
+.ruff_cache
+
 .env
 *__pycache__
+
+tsconfig.json
+*.db
