@@ -3,6 +3,7 @@ import json
 from urllib.parse import urljoin
 from typing import Callable, TypeVar
 
+from ..._config import config
 from loguru import logger
 from httpx import AsyncClient
 from bs4 import BeautifulSoup
@@ -57,7 +58,7 @@ class Telegraph:
     def __init__(self, client: AsyncClient, features: str | None = None):
         self.client = client
         self.features = features or "html.parser"
-        self._access_token: str | None = None
+        self._access_token: str | None = config.access_token
         self._username = "ai-memory"
 
     async def create_account(

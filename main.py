@@ -8,9 +8,9 @@ from src.core.entites.models import Base
 from src.core.service import Telegraph
 from src.core.manager import GeminiManager, MemoryManager
 from src.core.manager.create_memory import CreateMemoryManager
-
 from src.frontend import start_frontend
 from src.bot import start_bot
+from src.core import config
 
 
 async def main():
@@ -19,7 +19,9 @@ async def main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    async with AsyncClient() as client:
+    async with AsyncClient(
+        proxy = config.proxy
+    ) as client:
         telegraph = Telegraph(client)
         gemini = GeminiManager(client)
         api = MemoryManager(engine)
