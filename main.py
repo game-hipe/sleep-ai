@@ -5,29 +5,30 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from src.core.entites.models import Base
+from src.core.service import Telegraph
 from src.core.manager import GeminiManager, MemoryManager
+from src.core.manager.create_memory import CreateMemoryManager
 
 from src.frontend import start_frontend
 from src.bot import start_bot
 
 
 async def main():
-    database = create_async_engine("sqlite+aiosqlite:///test.db")
-    async with database.begin() as conn:
+    engine = create_async_engine("sqlite+aiosqlite:///database.db")
+
+    async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    try:
-        async with AsyncClient() as client:
-            ai_manager = GeminiManager(client)
-            memory_manager = MemoryManager(database)
+    async with AsyncClient() as client:
+        telegraph = Telegraph(client)
+        gemini = GeminiManager(client)
+        api = MemoryManager(engine)
 
-            await asyncio.gather(
-                start_frontend(ai_manager, memory_manager),
-                start_bot(ai_manager, memory_manager),
-            )
+        manager = CreateMemoryManager(gemini, telegraph, api)
 
-    finally:
-        await database.dispose()
+        await asyncio.gather(start_frontend(manager), start_bot(manager))
+
+    await engine.dispose()
 
 
 if __name__ == "__main__":

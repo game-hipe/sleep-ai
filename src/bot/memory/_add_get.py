@@ -2,6 +2,7 @@ import asyncio
 
 from loguru import logger
 from aiogram import F
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.filters import Command
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
@@ -13,6 +14,7 @@ from ...core.entites.schemas import (
     SleepMemoryBaseModel,
     SleepMemoryCreateModel,
     BaseResponseModel,
+    SleepMemoryModel,
 )
 
 
@@ -39,9 +41,9 @@ class MemoryGetSendRouter(MemoryBotRouter):
             await message.answer("Пожалуйста, введите ID воспоминания после команды.")
             return
 
-        response = await self.memory_bot.memory_manager.get_memory(id)
+        response = await self.memory_bot.manager.memory.get_memory(id)
         if not response.success:
-            logger.debug(f"Воспоминание не найдено (id={response.content.id})")
+            logger.debug(f"Воспоминание не найдено (id={id})")
             await message.answer(f"Воспоминание под ID {id} не надено.")
             return
 
@@ -51,7 +53,18 @@ class MemoryGetSendRouter(MemoryBotRouter):
                 title=response.content.title,
                 content=response.content.content,
                 thoughts=response.content.ai_thoughts,
+            ),
+            reply_markup=InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(
+                            text="Telegraph", url=response.content.telegraph_url
+                        )
+                    ]
+                ]
             )
+            if response.content.telegraph_url
+            else None,
         )
 
     async def create_memory(self, message: Message, state: FSMContext):
@@ -89,29 +102,27 @@ class MemoryGetSendRouter(MemoryBotRouter):
 
         try:
             if not response.success:
-                await message.answer(
-                    f"Произошла ошибка при генерации мыслей ИИ: {response.message}"
-                )
+                await message.answer(response.message)
                 return
-
-            memory_response = await self.memory_bot.memory_manager.add_memory(
-                response.content
-            )
-
-            if not memory_response.success:
-                await message.answer(
-                    f"Произошла ошибка при добавлении воспоминания: {memory_response.message}"
-                )
-                return
-            print(memory_response.content.created_at)
 
             await message.answer(
                 MEMORY_TEXT.format(
-                    id=memory_response.content.id,
-                    title=memory_response.content.title,
-                    content=memory_response.content.content,
-                    thoughts=memory_response.content.ai_thoughts,
+                    id=response.content.id,
+                    title=response.content.title,
+                    content=response.content.content,
+                    thoughts=response.content.ai_thoughts,
+                ),
+                reply_markup=InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [
+                            InlineKeyboardButton(
+                                text="Telegraph", url=response.content.telegraph_url
+                            )
+                        ]
+                    ]
                 )
+                if response.content.telegraph_url
+                else None,
             )
         except Exception as e:
             logger.error(f"Ошибка при обработке воспоминания: {e}")
@@ -124,14 +135,16 @@ class MemoryGetSendRouter(MemoryBotRouter):
 
     async def think(
         self, message: Message, title: str, content: str
-    ) -> BaseResponseModel[SleepMemoryCreateModel]:
+    ) -> (
+        BaseResponseModel[SleepMemoryCreateModel] | BaseResponseModel[SleepMemoryModel]
+    ):
         message = await message.answer("Раздумываю над ответом")
         await self.memory_bot.bot.send_chat_action(
             chat_id=message.chat.id, action="typing"
         )
         try:
             task = asyncio.create_task(self._animation(message))
-            response = await self.memory_bot.ai_manager.generate_response(
+            response = await self.memory_bot.manager.create_memory(
                 SleepMemoryBaseModel(title=title, content=content)
             )
 

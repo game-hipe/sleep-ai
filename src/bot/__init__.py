@@ -1,8 +1,7 @@
 from aiogram import Bot
 from aiogram.types import BotCommand
 
-from ..core.manager import MemoryManager
-from ..core.abstract.ai import AIInterface
+from ..core.manager.create_memory import CreateMemoryManager
 from ._bot import BaseMemoryBot
 
 from .memory import MemoryGetSendRouter
@@ -21,12 +20,11 @@ async def init_command(bot: Bot):
 
 
 async def setup_bot(
-    ai_manager: AIInterface,
-    memory_manager: MemoryManager,
+    manager: CreateMemoryManager,
     token: str | None = None,
     proxy: str | None = None,
 ) -> BaseMemoryBot:
-    bot = BaseMemoryBot(ai_manager, memory_manager, token=token, proxy=proxy)
+    bot = BaseMemoryBot(manager, token=token, proxy=proxy)
 
     routers = [MemoryGetSendRouter(bot)]
 
@@ -38,11 +36,10 @@ async def setup_bot(
 
 
 async def start_bot(
-    ai_manager: AIInterface,
-    memory_manager: MemoryManager,
+    manager: CreateMemoryManager,
     token: str | None = None,
     proxy: str | None = None,
 ) -> None:
-    bot = await setup_bot(ai_manager, memory_manager, token=token, proxy=proxy)
+    bot = await setup_bot(manager, token=token, proxy=proxy)
 
     await bot.run()

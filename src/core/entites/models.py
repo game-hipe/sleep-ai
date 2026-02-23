@@ -19,6 +19,7 @@ class SleepMemory(Base):
     title: Mapped[str] = mapped_column(String(255))
     content: Mapped[str] = mapped_column(Text(), nullable=False)
     ai_thoughts: Mapped[str | None] = mapped_column(Text(), nullable=True)
+    telegraph_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.now, nullable=False
     )
@@ -38,7 +39,7 @@ class SleepMemory(Base):
         return (
             f"<SleepMemory(id={self.id}, title='{self.title}', "
             f"created_at='{self.created_at}', content='{content_preview}', "
-            f"ai_thoughts='{ai_preview}')>"
+            f"ai_thoughts='{ai_preview}', telegraph_url='{self.telegraph_url}')>"
         )
 
     def to_dict(self):
@@ -48,4 +49,5 @@ class SleepMemory(Base):
             "content": self.content,
             "ai_thoughts": self.ai_thoughts,
             "created_at": self.created_at,
+            "telegraph_url": self.telegraph_url,
         }

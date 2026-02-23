@@ -6,18 +6,16 @@ from fastapi import FastAPI, APIRouter
 from fastapi import Request
 from fastapi.responses import HTMLResponse, FileResponse
 
-from ..core.abstract.ai import AIInterface
-from ..core.manager import MemoryManager
+from ..core.manager.create_memory import CreateMemoryManager
 
 
 app = FastAPI()
 
 
 class FrontEnd:
-    def __init__(self, ai_manager: AIInterface, memory_manager: MemoryManager):
+    def __init__(self, manager: CreateMemoryManager):
         self._app = FastAPI()
-        self.ai_manager = ai_manager
-        self.memory_manager = memory_manager
+        self.manager = manager
         self.register_handlers()
 
         self._index_path = Path(__file__).parent / "templates" / "index.html"

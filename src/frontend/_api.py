@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from ._frontend import FrontEnd
+from ..core.manager.create_memory import CreateMemoryManager
 from ..core.entites.schemas import (
     SleepMemoryBaseModel,
     BaseResponseModel,
@@ -9,7 +10,7 @@ from ..core.entites.schemas import (
 )
 
 
-def create_api(front_end: FrontEnd):
+def create_api(manager: CreateMemoryManager, frontend: FrontEnd):
 
     router = APIRouter(prefix="/api", tags=["api"])
 
@@ -29,12 +30,7 @@ def create_api(front_end: FrontEnd):
         Returns:
             BaseResponseModel[SleepMemoryModel]: Модель ответа с воспоминанием.
         """
-        response = await front_end.ai_manager.generate_response(memory)
-        if not response.success:
-            raise HTTPException(status_code=500, detail=response.message)
-
-        response = await front_end.memory_manager.add_memory(response.content)
-
+        response = await manager.create_memory(memory)
         if not response.success:
             raise HTTPException(status_code=500, detail=response.message)
 
@@ -50,7 +46,7 @@ def create_api(front_end: FrontEnd):
         Returns:
             BaseResponseModel[None]: Ничего не возращает кроме сообшение и статуса
         """
-        return await front_end.memory_manager.delete_memory(id)
+        return await manager.memory.delete_memory(id)
 
     @router.get("/memory/{id}")
     async def get_memory(id: int) -> BaseResponseModel[SleepMemoryModel]:
@@ -62,7 +58,7 @@ def create_api(front_end: FrontEnd):
         Returns:
             BaseResponseModel[SleepMemoryModel]: Модель ответа с воспоминанием.
         """
-        return await front_end.memory_manager.get_memory(id)
+        return await manager.memory.get_memory(id)
 
     @router.patch("/memory/{id}")
     async def update_memory(
@@ -77,6 +73,6 @@ def create_api(front_end: FrontEnd):
         Returns:
             BaseResponseModel[SleepMemoryModel]: Ответ с результатом операции.
         """
-        return await front_end.memory_manager.update_memory(memory_id=id, memory=memory)
+        return await manager.memory.update_memory(memory_id=id, memory=memory)
 
-    front_end.add_router(router)
+    frontend.add_router(router)

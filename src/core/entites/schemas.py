@@ -26,6 +26,7 @@ class SleepMemoryCreateModel(SleepMemoryBaseModel):
     """Модель данных для создания воспоминаний о сне."""
 
     ai_thoughts: str | None = Field(default=None)
+    telegraph_url: str | None = Field(default=None)
 
 
 class SleepMemoryModel(SleepMemoryCreateModel):
@@ -48,3 +49,4 @@ class SleepMemoryUpdateModel(BaseModel):
     title: str | None = Field(default=None)
     content: str | None = Field(default=None)
     ai_thoughts: str | None = Field(default=None)
+    telegraph_url: str | None = Field(default=None)

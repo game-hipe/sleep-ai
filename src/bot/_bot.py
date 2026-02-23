@@ -8,8 +8,7 @@ from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.client.default import DefaultBotProperties
 from aiogram import Bot, Dispatcher, Router
 
-from ..core.manager.memory import MemoryManager
-from ..core.abstract.ai import AIInterface
+from ..core.manager.create_memory import CreateMemoryManager
 from ..core import config
 
 
@@ -33,8 +32,7 @@ class BaseMemoryBot:
 
     def __init__(
         self,
-        ai_manager: AIInterface,
-        memory_manager: MemoryManager,
+        manager: CreateMemoryManager,
         token: str | None = None,
         proxy: str | None = None,
     ):
@@ -46,8 +44,7 @@ class BaseMemoryBot:
             token (str | None, optional): Токен бота, если токен бота не указае берётся дефолтное из config. Обычное состояние None.
             proxy (str | None, optional): Прокси сервер. Обычное состояние None.
         """
-        self.memory_manager = memory_manager
-        self.ai_manager = ai_manager
+        self.manager = manager
 
         self._token = token or config.bot_token
         self._proxy = proxy or config.proxy

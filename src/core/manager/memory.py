@@ -39,12 +39,7 @@ class MemoryManager:
         """
         async with self.session() as session:
             try:
-                save_memory = SleepMemory(
-                    title=memory.title,
-                    content=memory.content,
-                    ai_thoughts=memory.ai_thoughts,
-                    created_at=memory.created_at,
-                )
+                save_memory = self.build_memory(memory)
                 session.add(save_memory)
                 await session.flush()
 
@@ -145,6 +140,11 @@ class MemoryManager:
                     if memory.ai_thoughts is not None
                     else result.ai_thoughts
                 )
+                result.telegraph_url = (
+                    memory.telegraph_url
+                    if memory.telegraph_url is not None
+                    else result.telegraph_url
+                )
                 await session.flush()
 
                 return BaseResponseModel(
@@ -208,6 +208,7 @@ class MemoryManager:
                 content=memory.content,
                 ai_thoughts=memory.ai_thoughts,
                 created_at=memory.created_at,
+                telegraph_url=memory.telegraph_url,
             )
         else:
             raise TypeError("Неподдерживаемый тип воспоминания для построения модели")
