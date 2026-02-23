@@ -8,7 +8,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
 from .state import MemoryStates
-from ._text import MEMORY_TEXT
+from .._bot import MEMORY_TEXT
 from .._bot import MemoryBotRouter
 from ...core.entites.schemas import (
     SleepMemoryBaseModel,
@@ -41,31 +41,7 @@ class MemoryGetSendRouter(MemoryBotRouter):
             await message.answer("Пожалуйста, введите ID воспоминания после команды.")
             return
 
-        response = await self.memory_bot.manager.memory.get_memory(id)
-        if not response.success:
-            logger.debug(f"Воспоминание не найдено (id={id})")
-            await message.answer(f"Воспоминание под ID {id} не надено.")
-            return
-
-        await message.answer(
-            MEMORY_TEXT.format(
-                id=response.content.id,
-                title=response.content.title,
-                content=response.content.content,
-                thoughts=response.content.ai_thoughts,
-            ),
-            reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [
-                        InlineKeyboardButton(
-                            text="Telegraph", url=response.content.telegraph_url
-                        )
-                    ]
-                ]
-            )
-            if response.content.telegraph_url
-            else None,
-        )
+        await self.answer_memory(message, id)
 
     async def create_memory(self, message: Message, state: FSMContext):
         logger.debug(

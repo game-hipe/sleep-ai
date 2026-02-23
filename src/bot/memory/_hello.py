@@ -1,4 +1,4 @@
-from aiogram.filters import Command
+from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
 from .._bot import MemoryBotRouter
 
@@ -9,11 +9,18 @@ class BaseRouter(MemoryBotRouter):
 
         self.router.message.register(self.help, Command("help"))
 
-    async def hello(self, message: Message):
-        await message.answer(
-            "Привет! Я бот для создания и хранения воспоминаний.\n"
-            "Используйте /create для создания нового воспоминания и /memory для просмотра существующих."
-        )
+    async def hello(self, message: Message, command: CommandObject):
+        if command.args:
+            try:
+                id = int(command.args)
+                await self.answer_memory(message, id)
+            except TypeError:
+                await message.answer("Неправильный ID.")
+        else:
+            await message.answer(
+                "Привет! Я бот для создания и хранения воспоминаний.\n"
+                "Используйте /create для создания нового воспоминания и /memory для просмотра существующих."
+            )
 
     async def help(self, message: Message):
         await message.answer(

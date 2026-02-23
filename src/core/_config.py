@@ -25,6 +25,9 @@ class Config(BaseModel):
     access_token: str | None = Field(
         default=os.getenv("ACCESS_TOKEN"), json_schema_extra={"env": "ACCESS_TOKEN"}
     )
+    bot_url: str | None = Field(
+        default=os.getenv("BOT_URL"), json_schema_extra={"env": "BOT_URL"}
+    )
 
 
 config = Config()

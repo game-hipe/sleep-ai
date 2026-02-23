@@ -1,5 +1,7 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import PlainTextResponse
 
+from ..core import config
 from ._frontend import FrontEnd
 from ..core.manager.create_memory import CreateMemoryManager
 from ..core.entites.schemas import (
@@ -74,5 +76,12 @@ def create_api(manager: CreateMemoryManager, frontend: FrontEnd):
             BaseResponseModel[SleepMemoryModel]: Ответ с результатом операции.
         """
         return await manager.memory.update_memory(memory_id=id, memory=memory)
+
+    @router.get("/bot", response_class=PlainTextResponse)
+    async def get_bot():
+        """Возращает ссылку на URL-Тг бота"""
+        if config.bot_url:
+            return PlainTextResponse(config.bot_url)
+        raise HTTPException(404, "Бот не указан.")
 
     frontend.add_router(router)

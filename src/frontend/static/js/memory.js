@@ -16,6 +16,22 @@ function formatDate(dateString) {
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${year} года ${day} ${month} в ${hours}:${minutes}`;
 }
+async function getBot() {
+    try {
+        var response = await fetch("/api/bot", {
+            headers: {
+                'accept': 'application/json'
+            }
+        });
+        if (response.status == 200) {
+            return await response.text();
+        }
+    }
+    catch (error) {
+        console.log(error);
+    }
+    return null;
+}
 async function LoadMemory(id) {
     var response = await fetch(`/api/memory/${id}`, {
         headers: {
@@ -61,8 +77,15 @@ async function LoadMemory(id) {
     const TelegraphUrl = document.createElement("a");
     if (result.content.telegraph_url) {
         TelegraphUrl.setAttribute("href", result.content.telegraph_url);
-        TelegraphUrl.setAttribute("class", "telegraph");
+        TelegraphUrl.setAttribute("class", "telegram telegraph");
         TelegraphUrl.textContent = "Пост в Telegraph";
+    }
+    var bot = await getBot();
+    const TelegramUrl = document.createElement("a");
+    if (bot) {
+        TelegramUrl.setAttribute("href", `${bot}?start=${id}`);
+        TelegramUrl.setAttribute("class", "telegram phone");
+        TelegramUrl.textContent = "Версия для телеграм";
     }
     console.log(result.content.telegraph_url);
     infoBox.appendChild(title);
@@ -71,6 +94,10 @@ async function LoadMemory(id) {
     infoBox.appendChild(createdAt);
     if (result.content.telegraph_url) {
         infoBox.appendChild(TelegraphUrl);
+    }
+    if (bot) {
+        infoBox.appendChild(document.createElement("br"));
+        infoBox.appendChild(TelegramUrl);
     }
     mainBox.appendChild(infoBox);
 }

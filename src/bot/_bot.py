@@ -3,6 +3,8 @@ from urllib.parse import urlparse
 
 from loguru import logger
 from aiohttp import BasicAuth
+
+from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.client.default import DefaultBotProperties
@@ -10,6 +12,15 @@ from aiogram import Bot, Dispatcher, Router
 
 from ..core.manager.create_memory import CreateMemoryManager
 from ..core import config
+
+
+MEMORY_TEXT = (
+    "ID сна: <code>{id}</code>\n"
+    "Название сна: <b>{title}</b>\n"
+    "Содержание сна: <i>{content}</i>\n"
+    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+    "{thoughts}"
+)
 
 
 class MemoryBotRouter(ABC):
@@ -25,6 +36,33 @@ class MemoryBotRouter(ABC):
     @property
     def router(self):
         return self._router
+
+    async def answer_memory(self, message: Message, id: int):
+        response = await self.memory_bot.manager.memory.get_memory(id)
+        if not response.success:
+            logger.debug(f"Воспоминание не найдено (id={id})")
+            await message.answer(f"Воспоминание под ID {id} не надено.")
+            return
+
+        await message.answer(
+            MEMORY_TEXT.format(
+                id=response.content.id,
+                title=response.content.title,
+                content=response.content.content,
+                thoughts=response.content.ai_thoughts,
+            ),
+            reply_markup=InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(
+                            text="Telegraph", url=response.content.telegraph_url
+                        )
+                    ]
+                ]
+            )
+            if response.content.telegraph_url
+            else None,
+        )
 
 
 class BaseMemoryBot:
