@@ -17,7 +17,7 @@ class ErrorResponse(BaseResponse[None]):
 class Node(BaseModel):
     tag: str
     attrs: Optional[dict[str, str]]
-    children: Optional[list["Node" | str]]
+    children: Optional[list["Node"] | list[str]]
 
 
 class Account(BaseModel):

@@ -1,0 +1,14 @@
+services:
+  app:
+    build: .
+    container_name: ai-sleep-v1
+    env_file:
+      - .env
+
+    volumes:
+      - manga-day:/app/var
+    ports:
+      - "8000:8000"
+
+volumes:
+  manga-day:

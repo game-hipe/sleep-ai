@@ -14,7 +14,7 @@ from src.core import config
 
 
 async def main():
-    engine = create_async_engine("sqlite+aiosqlite:///database.db")
+    engine = create_async_engine(config.database_url)
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
